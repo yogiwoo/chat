@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const prefix = "http://localhost:8080";
+//const prefix = "http://localhost:8080";
+const prefix = "http://localhost:3002";
 const x = localStorage.getItem("userData");
 const token = JSON.parse(x);
 const myId = token?.id;
@@ -13,7 +14,7 @@ function Chatbox({ selectedChat, socket }) {
     const [text, setText] = useState("");
 
     const getMessages = async () => {
-        const response = await axios.get(`${prefix}/chat/getMyMessage?chatId=${selectedChat.chatId}`, {
+        const response = await axios.get(`${prefix}/getMyMessage?chatId=${selectedChat.chatId}`, {
             withCredentials: true,
             headers: {
                 Authorization: `Bearer ${token.token}`,
@@ -38,25 +39,30 @@ function Chatbox({ selectedChat, socket }) {
         };
     }, [selectedChat?.chatId]);
 
-    const handleSendMessage = async () => {
-        if (text.trim() === "") return;
+   const handleSendMessage = async () => {
+    if (text.trim() === "") return;
 
-        const response = await axios.post(`${prefix}/chat/sendMessage`, {
-            chatId: selectedChat.chatId,
-            message: text,
-            sender: myId
-        }, {
-            withCredentials: true,
-            headers: {
-                Authorization: `Bearer ${token.token}`,
-                'Content-Type': 'application/json'
-            }
-        });
+    const response = await axios.post(`${prefix}/sendMessage`, {
+        chatId: selectedChat.chatId,
+        receiverId: selectedChat.userId,   // 👈 add this
+        message: text,
+        sender: myId
+    }, {
+        withCredentials: true,
+        headers: {
+            Authorization: `Bearer ${token.token}`,
+            'Content-Type': 'application/json'
+        }
+    });
 
-        socket.emit("sendMsg", response?.data?.data);
-        setMessages([...messages, response.data.data]);
-        setText("");
-    };
+    // You don't actually need to emit again here if backend already does it
+    // But if you want instant UI update for yourself, keep it
+    socket.emit("sendMsg", response?.data?.data);
+
+    setMessages([...messages, response.data.data]);
+    setText("");
+};
+
 
     return (
         <>

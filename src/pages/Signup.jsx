@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import axios from "axios"
 import { Link } from 'react-router-dom';
+const containerUrl="http://localhost:3003/auth" //gateway url
 function Signup() {
     const [formData, setFormData] = useState({
         name: "",
@@ -17,7 +18,7 @@ function Signup() {
     }
     const handleSubmit = async (e) => {
         console.log("this one")
-        const postData = await axios.post("http://localhost:5005/auth/signup", formData)
+        const postData = await axios.post(`${containerUrl}/signup`, formData)
         console.log("===========================>", postData)
         if (postData) {
             alert("Signup successful")

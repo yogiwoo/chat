@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDataContext } from '../../reactProvider';
 const userData=localStorage.getItem('userData')
 const userUid=JSON.parse(userData)?.id
+const prefix = "http://localhost:3001";
+const prefix2="http://localhost:3002";
 function Header() {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -22,7 +24,7 @@ function Header() {
 
         try {
             setLoading(true);
-            const apiurl=`http://localhost:5005/auth/users?name=${query}`
+            const apiurl=`${prefix}/users?name=${query}`
             const response = await fetch(apiurl);
             const data = await response.json();
             setSearchResults(data);
@@ -36,6 +38,7 @@ function Header() {
 
     // Function to create chat session
     const createChatSession = async (userId) => {
+        console.log("user id===================>",userId,userUid);
         const object={
             members:[
                 userUid,
@@ -46,7 +49,7 @@ function Header() {
         const token = userData ? JSON.parse(userData).token : null;
 
         const data = await axios.post(
-            'http://localhost:8080/chat/startNewChat',
+            `${prefix2}/startNewChat`,
             object,
             {
                 headers: {

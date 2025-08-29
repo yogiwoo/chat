@@ -6,9 +6,10 @@ import{ useDataContext } from '../../reactProvider';
 import { io } from "socket.io-client"
 const x = localStorage.getItem("userData");
 const token =x? JSON.parse(x):null
-const prefix = "http://localhost:8080"
+//const prefix = "http://localhost:8080"
+const prefix = "http://localhost:3002";
 const userId=token?.id;
-const socket =io("http://localhost:8080",{
+const socket =io("http://localhost:3002",{
     withCredentials:true,
     extraHeaders:{
         "Content-Type":"application/json"
@@ -20,7 +21,7 @@ function Chatarea() {
   let {sessionId}=useDataContext();
   const fetchChats = async () => {
     try {
-      const response = await axios.get(`${prefix}/chat/getMyChats`, 
+      const response = await axios.get(`${prefix}/getMyChats`, 
       {
         withCredentials: true,
         headers: {
@@ -49,9 +50,9 @@ function Chatarea() {
   }, [token,sessionId]);
   useEffect(() => {
     console.log("chat list updated_______________",userlist)
-    const handleUpdate=(msg)=>{
+    const handleUpdate=( msg)=>{
       setuserlist(prev=> prev.map(i=> i._id===msg.chatId
-        ?{...i,lastMsg:MessageChannel.message}:i
+        ?{...i,lastMsg:msg.message}:i
       ))
     }
 
@@ -60,6 +61,7 @@ function Chatarea() {
       socket.off("receiveMsg",handleUpdate);
     }
   },[socket])
+  
   return (
     <div className="d-flex flex-column vh-100">
       <Header />

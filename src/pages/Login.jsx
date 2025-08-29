@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Container, Form, Button, Card } from 'react-bootstrap';
 import { Link,replace,useNavigate } from 'react-router-dom';
-
+const containerUrl="http://localhost:3003/auth"
 function Login() {
     const navigate=useNavigate();
     const [isCorrect,setIsCorrect]=useState(false)
@@ -25,7 +25,7 @@ function Login() {
         try{
 
         
-        let loginData=await axios.post("http://localhost:5005/auth/login",formData);
+        let loginData=await axios.post(`${containerUrl}/login`,formData);
        
         if(loginData.data.success===true){
             //alert("login success!")
