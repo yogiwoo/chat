@@ -12,7 +12,7 @@ function Chatbox({ selectedChat, socket }) {
 
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
-
+    const [typing, setTyping] = useState(false);
     const getMessages = async () => {
         const response = await axios.get(`${prefix}/getMyMessage?chatId=${selectedChat.chatId}`, {
             withCredentials: true,
@@ -28,7 +28,7 @@ function Chatbox({ selectedChat, socket }) {
         if (!selectedChat?.chatId || !socket) return;
 
         getMessages();
-        socket.emit("joinRoom", selectedChat.chatId);
+        socket.emit("joinRoom", selectedChat.chatId); //while clicking the chat it will joined room name chatId
         socket.on("receiveMsg", (message) => {
             setMessages((prev) => [...prev, message]);
         });
@@ -44,7 +44,7 @@ function Chatbox({ selectedChat, socket }) {
 
     const response = await axios.post(`${prefix}/sendMessage`, {
         chatId: selectedChat.chatId,
-        receiverId: selectedChat.userId,   // 👈 add this
+        receiverId: selectedChat.userId,
         message: text,
         sender: myId
     }, {
@@ -57,11 +57,15 @@ function Chatbox({ selectedChat, socket }) {
 
     // You don't actually need to emit again here if backend already does it
     // But if you want instant UI update for yourself, keep it
-    socket.emit("sendMsg", response?.data?.data);
+    //socket.emit("sendMsg", response?.data?.data);
 
     setMessages([...messages, response.data.data]);
     setText("");
 };
+
+const handleInputChange = (e) => { 
+    setText(e.target.value);
+}
 
 
     return (
@@ -108,7 +112,7 @@ function Chatbox({ selectedChat, socket }) {
                                 className="form-control"
                                 style={{ padding: '10px' }}
                                 value={text}
-                                onChange={e => setText(e.target.value)}
+                                onChange={handleInputChange} //e => setText(e.target.value)
                             />
                             <button className="btn btn-primary" onClick={handleSendMessage}>
                                 Send

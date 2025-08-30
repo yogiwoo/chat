@@ -8,7 +8,6 @@ const x = localStorage.getItem("userData");
 const token =x? JSON.parse(x):null
 //const prefix = "http://localhost:8080"
 const prefix = "http://localhost:3002";
-const userId=token?.id;
 const socket =io("http://localhost:3002",{
     withCredentials:true,
     extraHeaders:{
@@ -18,9 +17,11 @@ const socket =io("http://localhost:3002",{
 function Chatarea() {
   let [userlist, setuserlist] = useState([]);
   let [chatData,setChatdata]=useState(null);
+  let [isLoading,setIsloading]=useState(false);
   let {sessionId}=useDataContext();
   const fetchChats = async () => {
     try {
+      setIsloading(true);
       const response = await axios.get(`${prefix}/getMyChats`, 
       {
         withCredentials: true,
@@ -33,6 +34,8 @@ function Chatarea() {
     } catch (error) {
       console.error('Error fetching chats:', error);
       // Handle error appropriately
+    } finally {
+      setIsloading(false);
     }
   };
   const handleGetMsg =async (data)=>{
@@ -55,7 +58,6 @@ function Chatarea() {
         ?{...i,lastMsg:msg.message}:i
       ))
     }
-
     socket.on("receiveMsg",handleUpdate);
     return ()=>{
       socket.off("receiveMsg",handleUpdate);
