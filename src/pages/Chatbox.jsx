@@ -7,7 +7,7 @@ const x = localStorage.getItem("userData");
 const token = JSON.parse(x);
 const myId = token?.id;
 
-function Chatbox({ selectedChat, socket }) {
+function Chatbox({ selectedChat, socket ,isOnline }) {
     console.log("data in chatbox", selectedChat);
 
     const [messages, setMessages] = useState([]);
