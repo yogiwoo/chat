@@ -20,6 +20,7 @@ function Chatarea() {
   let [chatData, setChatdata] = useState(null);
   let [isLoading, setIsloading] = useState(false);
   let { sessionId } = useDataContext();
+  //fetches saved message from api
   const fetchChats = async () => {
     try {
       setIsloading(true);
@@ -31,7 +32,9 @@ function Chatarea() {
             'Content-Type': 'application/json'
           }
         });
+        //first setting all user to offline
       setuserlist(response.data.chats.map((dat) => ({ ...dat, isOnline: false })));
+      //joining all rooms of that user
         response.data.chats.forEach((chat)=>{
           socket.emit("joinRoom",chat._id.toString())
           console.log("joined room",chat._id.toString())
@@ -59,10 +62,9 @@ function Chatarea() {
     }
   }, [token, sessionId]);
 
+  //update the last message in userlist when new message received (chat list in left sidebar)
   useEffect(() => {
     const handleUpdate=( msg)=>{
-      // console.log("===========================================>hippie",msg.chatId)
-      // console.log("===========================================>hippie",msg.message)
       setuserlist(prev=> prev.map(i=> i._id===msg.chatId
         ?{...i,lastMsg:msg.message}:i
       ))
