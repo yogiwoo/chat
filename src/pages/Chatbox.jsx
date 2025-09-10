@@ -46,7 +46,7 @@ function Chatbox({ selectedChat, socket ,isOnline }) {
         chatId: selectedChat.chatId,
         receiverId: selectedChat.userId,
         message: text,
-        sender: myId
+        sender: myId,
     }, {
         withCredentials: true,
         headers: {

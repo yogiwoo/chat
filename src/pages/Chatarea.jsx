@@ -32,14 +32,14 @@ function Chatarea() {
             'Content-Type': 'application/json'
           }
         });
-        //first setting all user to offline
+      //first setting all user to offline
       setuserlist(response.data.chats.map((dat) => ({ ...dat, isOnline: false })));
       //joining all rooms of that user
-        response.data.chats.forEach((chat)=>{
-          socket.emit("joinRoom",chat._id.toString())
-          console.log("joined room",chat._id.toString())
-        })
-      
+      response.data.chats.forEach((chat) => {
+        socket.emit("joinRoom", chat._id.toString())
+        console.log("joined room", chat._id.toString())
+      })
+
     } catch (error) {
       console.error('Error fetching chats:', error);
       // Handle error appropriately
@@ -64,20 +64,18 @@ function Chatarea() {
 
   //update the last message in userlist when new message received (chat list in left sidebar)
   useEffect(() => {
-    const handleUpdate=( msg)=>{
-      setuserlist(prev=> prev.map(i=> i._id===msg.chatId
-        ?{...i,lastMsg:msg.message}:i
-      ))
+    const handleUpdate = (msg) => {
+      console.log("=============================================================",msg)
+      setuserlist(prev => prev.map(i => i._id === msg.chatId ? { ...i, lastMsg: msg.message,isRead:i.isRead } : i))
     }
-    socket.on("receiveMsg",handleUpdate);
-    return ()=>{
-      socket.off("receiveMsg",handleUpdate);
+    socket.on("receiveMsg", handleUpdate);
+    return () => {
+      socket.off("receiveMsg", handleUpdate);
     }
-  },[socket,userlist])
+  }, [socket, userlist])
 
   //mantain the online status in userList array coming from api
   useEffect(() => {
-
     socket.on('onlineStatus', (onlineUserIds) => {
       console.log("Online users from server:", onlineUserIds);
       setuserlist(prev => prev.map(user => ({
@@ -91,8 +89,6 @@ function Chatarea() {
       socket.off("onlineStatus");
     };
   }, [socket])
-
-
   return (
     <div className="d-flex flex-column vh-100">
       <Header />
@@ -101,7 +97,7 @@ function Chatarea() {
           {/* sidebar that display your added users */}
           <div className="userlist p-3 rounded overflow-auto h-100">
             {userlist.map((i) => (
-              <div key={i._id} value={i._id} onClick={(e) => handleGetMsg(i)} className="usercontainer d-flex align-items-center gap-3 p-1">
+              <div key={i._id} value={i._id} onClick={(e) => {handleGetMsg(i)}} className="usercontainer d-flex align-items-center gap-3 p-1">
                 <img
                   src={i.image}
                   userName={i.name}
@@ -112,7 +108,7 @@ function Chatarea() {
                   <p className="mb-0 fw-semibold">{i.userName}  {i.isOnline ? (<span className="green-dot"></span>) : (
                     <span className="red-dot"></span>)}</p>
 
-                  <p className="last-message">{i.lastMsg}</p>
+                  <p className="last-message">{i.isRead?<><b>{i.lastMsg}</b></>:<>{i.lastMsg}</>}</p>
                 </span>
               </div>
             ))}
