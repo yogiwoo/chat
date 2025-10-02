@@ -1,12 +1,21 @@
-# React + Vite
+# 🚀 Microservices Chat Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A real-time chat application built with microservices architecture, featuring user authentication, real-time messaging, and typing indicators.
 
-Currently, two official plugins are available:
+## ✨ Features
+- 🔐 JWT-based authentication + Google OAuth 2.0
+- 💬 Real-time messaging with Socket.io
+- ⌨️ Live typing indicators
+- 👤 Online/offline user status
+- 🏗️ Microservices architecture with API Gateway
+- 🐳 Dockerized services
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB
+- **Real-time:** Socket.io
+- **Authentication:** JWT, Passport.js, Google OAuth
+- **Containerization:** Docker, Docker Compose
+- **Architecture:** Microservices with API Gateway
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📁 Architecture
