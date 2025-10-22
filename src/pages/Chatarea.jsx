@@ -65,8 +65,8 @@ function Chatarea() {
   //update the last message in userlist when new message received (chat list in left sidebar)
   useEffect(() => {
     const handleUpdate = (msg) => {
-      console.log("=============================================================",msg)
-      setuserlist(prev => prev.map(i => i._id === msg.chatId ? { ...i, lastMsg: msg.message,isRead:i.isRead } : i))
+      console.log("=============================================================", msg)
+      setuserlist(prev => prev.map(i => i._id === msg.chatId ? { ...i, lastMsg: msg.message, isRead: i.isRead } : i))
     }
     socket.on("receiveMsg", handleUpdate);
     return () => {
@@ -97,7 +97,7 @@ function Chatarea() {
           {/* sidebar that display your added users */}
           <div className="userlist p-3 rounded overflow-auto h-100">
             {userlist.map((i) => (
-              <div key={i._id} value={i._id} onClick={(e) => {handleGetMsg(i)}} className="usercontainer d-flex align-items-center gap-3 p-1">
+              <div key={i._id} value={i._id} onClick={(e) => { handleGetMsg(i) }} className="usercontainer d-flex align-items-center gap-3 p-1">
                 <img
                   src={i.image}
                   userName={i.name}
@@ -108,7 +108,7 @@ function Chatarea() {
                   <p className="mb-0 fw-semibold">{i.userName}  {i.isOnline ? (<span className="green-dot"></span>) : (
                     <span className="red-dot"></span>)}</p>
 
-                  <p className="last-message">{i.isRead?<><b>{i.lastMsg}</b></>:<>{i.lastMsg}</>}</p>
+                  <p className="last-message">{i.isRead ? <><b>{i.lastMsg}</b></> : <>{i.lastMsg}</>}</p>
                 </span>
               </div>
             ))}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useRef } from "react";
 import axios from "axios";
 
 //const prefix = "http://localhost:8080";
@@ -13,6 +13,7 @@ function Chatbox({ selectedChat, socket ,isOnline }) {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [typing, setTyping] = useState(false);
+    const messageEndRef=useRef(null)
     const getMessages = async () => {
         const response = await axios.get(`${prefix}/getMyMessage?chatId=${selectedChat.chatId}`, {
             withCredentials: true,
@@ -23,6 +24,11 @@ function Chatbox({ selectedChat, socket ,isOnline }) {
         });
         setMessages(response.data.data);
     };
+    useEffect(()=>{
+        if(messageEndRef.current){
+            messageEndRef.current.scrollIntoView({behavior:"smooth"})
+        }
+    },[messages])
 
     useEffect(() => {
         if (!selectedChat?.chatId || !socket) return;
@@ -70,6 +76,7 @@ const handleInputChange = (e) => {
 
     return (
         <>
+      
             {selectedChat ? (
                 <div className="chat-area d-flex flex-column h-100 w-100 overflow-hidden">
                     {/* Header */}
@@ -87,11 +94,14 @@ const handleInputChange = (e) => {
                     </div>
 
                     {/* Messages */}
+                     
                     <div className="messages flex-grow-1 p-3 overflow-auto mx-0">
                         {
                             messages.length ? (
                                 messages.map((i, idx) => (
+                                    
                                     <div key={idx} className={`d-flex mb-3 ${i?.sender === myId ? 'justify-content-end' : 'justify-content-start'}`}>
+                                       
                                         <div className={`p-3 rounded text-white ${i?.sender === myId ? "bg-dark" : "bg-primary"}`} style={{ maxWidth: '75%' }}>
                                             <p>{i?.message}</p>
                                         </div>
@@ -101,6 +111,7 @@ const handleInputChange = (e) => {
                                 <div className="empty-msg">There is no message let's talk</div>
                             )
                         }
+                        <div ref={messageEndRef}/>
                     </div>
 
                     {/* Input Area */}
