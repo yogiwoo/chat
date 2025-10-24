@@ -4,9 +4,7 @@ import Header from "./Header";
 import axios from "axios";
 import { useDataContext } from '../../reactProvider';
 import { io } from "socket.io-client"
-const x = localStorage.getItem("userData");
 
-const token = x ? JSON.parse(x) : null
 //const prefix = "http://localhost:8080"
 const prefix = "http://localhost:3002";
 const socket = io("http://localhost:3002", {
@@ -20,8 +18,20 @@ function Chatarea() {
   let [chatData, setChatdata] = useState(null);
   let [isLoading, setIsloading] = useState(false);
   let { sessionId } = useDataContext();
+  
+  // Get token from localStorage inside component to make it reactive
+  const getToken = () => {
+    const x = localStorage.getItem("userData");
+    return x ? JSON.parse(x) : null;
+  };
   //fetches saved message from api
   const fetchChats = async () => {
+    const token = getToken();
+    if (!token) {
+      console.log("No token available");
+      return;
+    }
+    
     try {
       setIsloading(true);
       const response = await axios.get(`${prefix}/getMyChats`,
@@ -55,12 +65,22 @@ function Chatarea() {
     }
     setChatdata(data)
   }
+  // Initial load effect - runs when component mounts
   useEffect(() => {
+    const token = getToken();
     if (token) {
       socket.emit("registerUser", token.id)
       fetchChats();
     }
-  }, [token, sessionId]);
+  }, []); // Empty dependency array - runs only on mount
+
+  // Effect for sessionId changes
+  useEffect(() => {
+    const token = getToken();
+    if (token && sessionId) {
+      fetchChats();
+    }
+  }, [sessionId]);
 
   //update the last message in userlist when new message received (chat list in left sidebar)
   useEffect(() => {

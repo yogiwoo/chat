@@ -18,14 +18,20 @@ function ProtectedRoute({children}){
 function OpenRoute({children}){
   let token =localStorage.getItem("userData");
   console.log("this one executed",typeof token)
-  let userData=JSON.parse(token);
-  if(userData?.token){
-    console.log("this one executed")
-    return <Navigate to="/home" replace/>
+  
+  if(token){
+    try {
+      let userData=JSON.parse(token);
+      if(userData?.token){
+        console.log("this one executed")
+        return <Navigate to="/home" replace/>
+      }
+    } catch (error) {
+      console.error("Error parsing userData:", error);
+    }
   }
-  else{
-    return children
-  }
+  
+  return children;
 }
 
 function App() {
