@@ -28,7 +28,7 @@ function Header() {
         setShowDropdown(prev => !prev);  // Toggle dropdown
     };
 
-    // Handle clicking outside to close dropdown
+    // Handle clicking outside to close dropdown imporatant  - >CHATGPT CODE ADDED
     useEffect(() => {
         function handleClickOutside(event) {
             // If click is outside the dropdown container, close it
