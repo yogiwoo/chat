@@ -4,7 +4,7 @@ import Header from "./Header";
 import axios from "axios";
 import { useDataContext } from '../../reactProvider';
 import { io } from "socket.io-client"
-
+import pp from "./../../public/profile.png"
 //const prefix = "http://localhost:8080"
 const prefix = "http://localhost:3002";
 const socket = io("http://localhost:3002", {
@@ -119,16 +119,15 @@ function Chatarea() {
             {userlist.map((i) => (
               <div key={i._id} value={i._id} onClick={(e) => { handleGetMsg(i) }} className="usercontainer d-flex align-items-center gap-3 p-1">
                 <img
-                  src={i.image}
+                  src={i.image?i.image:pp}
                   userName={i.name}
                   className="profilepic rounded-circle border"
                   style={{ width: '40px', height: '40px', objectFit: 'cover' }}
                 />
-                <span>
-                  <p className="mb-0 fw-semibold">{i.userName}  {i.isOnline ? (<span className="green-dot"></span>) : (
+                <span style={{ height: '40px' }} className="d-flex flex-column justify-content-center overflow-hidden">
+                  <p className="mb-0 fw-semibold text-truncate">{i.userName}  {i.isOnline ? (<span className="green-dot"></span>) : (
                     <span className="red-dot"></span>)}</p>
-
-                  <p className="last-message">{i.isRead ? <><b>{i.lastMsg}</b></> : <>{i.lastMsg}</>}</p>
+                  <p className="last-message mb-0 text-truncate" style={{ fontSize: '0.85rem' }}>{i.isRead ? <><b>{i.lastMsg}</b></> : <>{i.lastMsg}</>}</p>
                 </span>
               </div>
             ))}

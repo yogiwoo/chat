@@ -1,19 +1,19 @@
-import { useEffect, useState,useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-
+import pp from "./../../public/profile.png"
 //const prefix = "http://localhost:8080";
 const prefix = "http://localhost:3002";
 const x = localStorage.getItem("userData");
 const token = JSON.parse(x);
 const myId = token?.id;
 
-function Chatbox({ selectedChat, socket ,isOnline }) {
+function Chatbox({ selectedChat, socket, isOnline }) {
     console.log("data in chatbox", selectedChat);
 
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [typing, setTyping] = useState(false);
-    const messageEndRef=useRef(null)
+    const messageEndRef = useRef(null)
     const getMessages = async () => {
         const response = await axios.get(`${prefix}/getMyMessage?chatId=${selectedChat.chatId}`, {
             withCredentials: true,
@@ -24,11 +24,11 @@ function Chatbox({ selectedChat, socket ,isOnline }) {
         });
         setMessages(response.data.data);
     };
-    useEffect(()=>{
-        if(messageEndRef.current){
-            messageEndRef.current.scrollIntoView({behavior:"smooth"})
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: "smooth" })
         }
-    },[messages])
+    }, [messages])
 
     useEffect(() => {
         if (!selectedChat?.chatId || !socket) return;
@@ -45,63 +45,71 @@ function Chatbox({ selectedChat, socket ,isOnline }) {
         };
     }, [selectedChat?.chatId]);
 
-   const handleSendMessage = async () => {
-    if (text.trim() === "") return;
+    const handleSendMessage = async () => {
+        if (text.trim() === "") return;
 
-    const response = await axios.post(`${prefix}/sendMessage`, {
-        chatId: selectedChat.chatId,
-        receiverId: selectedChat.userId,
-        message: text,
-        sender: myId,
-    }, {
-        withCredentials: true,
-        headers: {
-            Authorization: `Bearer ${token.token}`,
-            'Content-Type': 'application/json'
+        const response = await axios.post(`${prefix}/sendMessage`, {
+            chatId: selectedChat.chatId,
+            receiverId: selectedChat.userId,
+            message: text,
+            sender: myId,
+        }, {
+            withCredentials: true,
+            headers: {
+                Authorization: `Bearer ${token.token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // You don't actually need to emit again here if backend already does it
+        // But if you want instant UI update for yourself, keep it
+        //socket.emit("sendMsg", response?.data?.data);
+
+        setMessages([...messages, response.data.data]);
+        setText("");
+    };
+
+    const handleInputChange = (e) => {
+        setText(e.target.value);
+    }
+
+    // New function to send message when Enter is pressed
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleSendMessage();
         }
-    });
-
-    // You don't actually need to emit again here if backend already does it
-    // But if you want instant UI update for yourself, keep it
-    //socket.emit("sendMsg", response?.data?.data);
-
-    setMessages([...messages, response.data.data]);
-    setText("");
-};
-
-const handleInputChange = (e) => { 
-    setText(e.target.value);
-}
+    }
 
 
     return (
         <>
-      
+
             {selectedChat ? (
                 <div className="chat-area d-flex flex-column h-100 w-100 overflow-hidden">
                     {/* Header */}
                     <div className="header d-flex justify-content-between align-items-center p-3 border-bottom flex-shrink-0">
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center" style={{ minHeight: '40px' }}>
                             <img
-                                src={selectedChat.image}
+                                src={selectedChat.image ? selectedChat.image : pp}
                                 className="rounded-circle me-3"
-                                style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                                style={{ width: '40px', height: '40px', objectFit: 'cover', alignSelf: 'center' }}
                                 alt="Profile"
                             />
-                            <h4 className="mb-0">{selectedChat.name}</h4>
+                            <span style={{ lineHeight: 1 }}>{selectedChat.name}</span>
                         </div>
-                        <button className="btn btn-primary">Call</button>
+                        {/* <button className="btn btn-primary">Call</button> */}
                     </div>
 
                     {/* Messages */}
-                     
+
                     <div className="messages flex-grow-1 p-3 overflow-auto mx-0">
                         {
                             messages.length ? (
                                 messages.map((i, idx) => (
-                                    
+
                                     <div key={idx} className={`d-flex mb-3 ${i?.sender === myId ? 'justify-content-end' : 'justify-content-start'}`}>
-                                       
+
                                         <div className={`p-3 rounded text-white ${i?.sender === myId ? "bg-dark" : "bg-primary"}`} style={{ maxWidth: '75%' }}>
                                             <p>{i?.message}</p>
                                         </div>
@@ -111,7 +119,7 @@ const handleInputChange = (e) => {
                                 <div className="empty-msg">There is no message let's talk</div>
                             )
                         }
-                        <div ref={messageEndRef}/>
+                        <div ref={messageEndRef} />
                     </div>
 
                     {/* Input Area */}
@@ -124,6 +132,7 @@ const handleInputChange = (e) => {
                                 style={{ padding: '10px' }}
                                 value={text}
                                 onChange={handleInputChange} //e => setText(e.target.value)
+                                onKeyDown={handleKeyDown}
                             />
                             <button className="btn btn-primary" onClick={handleSendMessage}>
                                 Send
