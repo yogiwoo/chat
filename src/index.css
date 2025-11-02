@@ -77,3 +77,24 @@ html, body {
   display: inline-block;
   margin-left: 5px;
 }
+
+.typing-indicator{
+  background-color: rgb(255, 213, 185);
+  color:black;
+  font-size: 0.8rem;
+}
+.chat-input {
+    height: 44px;
+    border-radius: 20px;
+    padding: 0 20px;
+    margin-right: 8px;
+}
+
+.chat-send-button {
+    border-radius: 20px;
+    width: 80px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

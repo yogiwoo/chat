@@ -13,6 +13,8 @@ function Chatbox({ selectedChat, socket, isOnline }) {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
     const [typing, setTyping] = useState(false);
+    const [tTimeOut, setTtimeout] = useState(null);
+    const [typingUser, setTypingUser] = useState("");
     const messageEndRef = useRef(null)
     const getMessages = async () => {
         const response = await axios.get(`${prefix}/getMyMessage?chatId=${selectedChat.chatId}`, {
@@ -45,7 +47,65 @@ function Chatbox({ selectedChat, socket, isOnline }) {
         };
     }, [selectedChat?.chatId]);
 
+    // Fix typing listeners with proper dependencies and null checks
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleTypingStart = (data) => {
+            console.log("Typing started:", data);
+            setTypingUser(data.userName);
+        };
+
+        const handleTypingStop = (data) => {
+            console.log("stopped typing ", data)
+            setTypingUser("");
+        };
+
+        socket.on('display_typing', handleTypingStart);
+        socket.on('stop-typing', handleTypingStop);
+
+        return () => {
+            socket.off('display_typing', handleTypingStart);
+            socket.off('stop-typing', handleTypingStop);
+        };
+    }, [socket]);
+
+    // Fix handleTyping with consistent event names
+    function handleTyping() {
+        if (!socket || !selectedChat?.chatId) return;
+
+        socket.emit('typing', {
+            chatId: selectedChat.chatId,
+            userName: selectedChat.name
+        });
+
+        if (tTimeOut) {
+            clearTimeout(tTimeOut);
+        }
+
+        const timeOut = setTimeout(() => {
+            socket.emit('stop-typing', {
+                chatId: selectedChat.chatId,
+                userName: selectedChat.name
+            });
+        }, 3000);
+
+        setTtimeout(timeOut);
+    }
+
+    // Fix handleSendMessage with consistent event name
     const handleSendMessage = async () => {
+        if (!socket || !selectedChat?.chatId) return;
+
+        if (tTimeOut) {
+            clearTimeout(tTimeOut);
+        }
+
+        socket.emit('stop-typing', {
+            chatId: selectedChat.chatId,
+            userName: selectedChat.name
+        })
+
         if (text.trim() === "") return;
 
         const response = await axios.post(`${prefix}/sendMessage`, {
@@ -80,7 +140,6 @@ function Chatbox({ selectedChat, socket, isOnline }) {
             handleSendMessage();
         }
     }
-
 
     return (
         <>
@@ -123,18 +182,40 @@ function Chatbox({ selectedChat, socket, isOnline }) {
                     </div>
 
                     {/* Input Area */}
-                    <div className="input-area p-4 border-top flex-shrink-0">
+                    {typingUser && (
+                        <p className="text-center m-0 p-0 typing-indicator">
+                            {typingUser} is typing...
+                        </p>
+                    )}
+                    <div className="input-area px-3 py-2 border-top">
                         <div className="input-group">
                             <input
                                 type="text"
                                 placeholder="Type a message"
                                 className="form-control"
-                                style={{ padding: '10px' }}
+                                style={{
+                                    height: '44px',
+                                    borderRadius: '20px',
+                                    paddingLeft: '20px',
+                                    paddingRight: '20px',
+                                    marginRight: '8px'
+                                }}
                                 value={text}
-                                onChange={handleInputChange} //e => setText(e.target.value)
+                                onChange={(e) => {
+                                    handleInputChange(e);
+                                    handleTyping();
+                                }}
                                 onKeyDown={handleKeyDown}
                             />
-                            <button className="btn btn-primary" onClick={handleSendMessage}>
+                            <button
+                                className="btn btn-primary d-flex align-items-center justify-content-center"
+                                style={{
+                                    borderRadius: '20px',
+                                    width: '80px',
+                                    height: '44px'
+                                }}
+                                onClick={handleSendMessage}
+                            >
                                 Send
                             </button>
                         </div>

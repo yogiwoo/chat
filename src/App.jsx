@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate,useNavigate, replace }
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import { useEffect } from 'react';
+import Profile from './pages/Profile';
 
 function ProtectedRoute({children}){
   let token=localStorage.getItem('userData')
@@ -47,7 +48,7 @@ function App() {
 
         {/* Protected route - only accessible when logged in */}
         <Route path="/home" element= {<ProtectedRoute><Chatarea/></ProtectedRoute>}/>
-
+        <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
         {/* Default route - redirect based on auth status */}
         {/* <Route path="/" element={localStorage.getItem('userData')? <Navigate to="/home" replace />: <Navigate to="/login" replace />} /> */}
       </Routes>
