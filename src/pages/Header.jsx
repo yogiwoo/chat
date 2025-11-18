@@ -6,7 +6,7 @@ import pp from "./../../public/profile.png";
 const userData = localStorage.getItem('userData')
 const userUid = JSON.parse(userData)?.id
 const prefix = "http://localhost:3001";
-const prefix2 = "http://localhost:3002";
+const prefix2 = "http://localhost:4000";
 
 function Header() {
     const [searchTerm, setSearchTerm] = useState('');

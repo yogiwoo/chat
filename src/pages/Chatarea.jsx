@@ -6,8 +6,8 @@ import { useDataContext } from '../../reactProvider';
 import { io } from "socket.io-client"
 import pp from "./../../public/profile.png"
 //const prefix = "http://localhost:8080"
-const prefix = "http://localhost:3002";
-const socket = io("http://localhost:3002", {
+const prefix = "http://localhost:4000"; //chat container port 3002 nginx port 4000
+const socket = io("http://localhost:4000", {
   withCredentials: true,
   extraHeaders: {
     "Content-Type": "application/json"

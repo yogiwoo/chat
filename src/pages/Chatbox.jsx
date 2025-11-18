@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import pp from "./../../public/profile.png"
 //const prefix = "http://localhost:8080";
-const prefix = "http://localhost:3002";
+const prefix = "http://localhost:4000";
 const x = localStorage.getItem("userData");
 const token = JSON.parse(x);
 const myId = token?.id;
